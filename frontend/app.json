@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Restaurant Queue",
+    "slug": "restaurant-queue",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": { "backgroundColor": "#6366F1" },
+    "assetBundlePatterns": ["**/*"],
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.yourco.restaurantqueue" },
+    "android": { "adaptiveIcon": { "backgroundColor": "#6366F1" }, "package": "com.yourco.restaurantqueue" },
+    "web": { "bundler": "metro" },
+    "extra": { "apiUrl": "http://localhost:6000" },
+    "plugins": ["expo-secure-store", "expo-camera"]
+  }
+}

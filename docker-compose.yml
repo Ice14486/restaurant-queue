@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: restaurant_queue
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/restaurant_queue
+      JWT_SECRET: replace_in_production
+      FLASK_ENV: development
+    depends_on:
+      - mongo
+    volumes:
+      - ./backend:/app
+
+volumes:
+  mongo_data:

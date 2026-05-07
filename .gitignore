@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/
+
+# Node / Expo
+node_modules/
+.expo/
+dist/
+web-build/
+*.log
+
+# Mongo
+mongo_data/
+
+# OS
+.DS_Store
+Thumbs.db
+.Rhistory
