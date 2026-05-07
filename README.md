@@ -1,80 +1,103 @@
 # Restaurant Online Queuing System
 
-A restaurant queue management system for customers and restaurant staff. Customers can browse restaurants, join a queue remotely, track their queue status, and view history. Staff can manage the live queue, call the next party, seat customers, manage table status, and update restaurant settings.
+A restaurant queue management app for customers and restaurant staff/admins. Customers can browse restaurants, join a queue remotely, track queue status, leave a queue, scan a restaurant QR code, and view booking history. Staff/admin users can manage live queues, call the next party, assign called parties to tables, update table states, and configure restaurant settings.
 
-The project follows the technology stack in `Project_Proposal.pdf`: React Native + TypeScript + Expo for mobile and web, Python + Flask for the backend API, MongoDB for data storage, JWT for authentication, and Flask-SocketIO / polling for real-time queue sync.
+The implementation follows `Project_Proposal.pdf`: React Native + TypeScript + Expo for web/mobile, Flask for the backend API, MongoDB for storage, JWT authentication, and Flask-SocketIO for real-time queue updates.
+
+## Current Demo Data
+
+This local demo database has three restaurants:
+
+| Restaurant | Cuisine | Restaurant ID | Staff ID | PIN |
+| --- | --- | --- | --- | --- |
+| Siam Basil Demo | Thai | `69fcb1c6a72ac7d55216e768` | `admin` | `123456` |
+| PizzaCompany | Pizza | `69fcb64b286d7a1d2349c0af` | `admin` | `123456` |
+| Katsuya | Japanese | `69fcb64b286d7a1d2349c0ba` | `admin` | `123456` |
+
+Demo customer:
+
+```text
+Email: demo.user@example.com
+Password: password123
+```
+
+QR code payload format:
+
+```text
+restaurantId:<restaurant_id>
+```
+
+Example:
+
+```text
+restaurantId:69fcb1c6a72ac7d55216e768
+```
 
 ## Features
 
 ### Customer
 
-- Register and log in as a customer
-- Browse and search restaurants
-- View restaurant queue length and estimated wait time
+- Register and log in with email/password
+- Browse and search restaurants by name or cuisine
+- View queue length and estimated wait time
 - Join a restaurant queue with party size
-- Track live queue position and estimated wait
-- Receive an in-app turn alert when staff calls the party
+- Track active queue status and position
 - Leave/cancel an active queue
+- Scan a restaurant QR code to open its queue page
 - View queue booking history
+- Log out from the Discover screen
 
 ### Staff / Admin
 
 - Log in with restaurant ID, staff ID, and PIN
-- View the restaurant queue dashboard
+- View a live queue dashboard
 - Call the next waiting party
-- Mark a called party as seated
-- Manage table status: available, occupied, cleaning, reserved
-- Update restaurant settings such as queue capacity, average turn time, and accepting queue status
-- Admin can create staff users
+- Assign a called party to an available table
+- Manage table state with one-tap cycle: available -> occupied -> checked -> available
+- Update queue capacity, average turn time, opening hours, closing hours, and accepting-queue status
+- Log out from the queue dashboard
 
-### Real-Time Updates
+### Real Time
 
-- Socket.IO is used for live queue updates.
-- Staff clients subscribe to their restaurant room.
-- Customer clients subscribe to their active restaurant queue.
-- Customers receive a `your_turn` event when their queue entry is called.
+- Socket.IO broadcasts queue updates to restaurant subscribers
+- Customers receive `your_turn` when staff calls their party
+- Table status updates are broadcast to staff clients
 
-## Technology Stack
+## Tech Stack
 
 | Layer | Technology |
 | --- | --- |
-| Mobile Frontend | React Native + TypeScript + Expo |
-| Web Frontend | React Native + TypeScript + Expo through Expo Web / React |
-| Backend / API | Python + Flask |
-| Database | MongoDB (NoSQL) |
-| Authentication | JWT (JSON Web Tokens) with role claims |
-| Real-time Sync | Flask-SocketIO / polling with `socket.io-client` |
-
-Supporting implementation tools:
-
-- `bcrypt` for password/PIN hashing
-- `axios` for frontend HTTP requests
-- Docker Compose for running MongoDB and the backend together
+| Mobile/Web frontend | React Native + TypeScript + Expo |
+| Backend/API | Python + Flask |
+| Database | MongoDB |
+| Auth | JWT role claims |
+| Real-time sync | Flask-SocketIO + `socket.io-client` |
+| Deployment helper | Docker Compose for MongoDB/backend |
 
 ## Project Structure
 
 ```text
 .
 |-- backend/
-|   |-- app.py                  # Flask app factory and Socket.IO setup
-|   |-- config.py               # Environment-based configuration
-|   |-- models/                 # MongoDB document helpers/serializers
-|   |-- routes/                 # REST API blueprints
-|   |-- middleware/             # JWT auth and role guards
-|   |-- sockets/                # Socket.IO event registration
+|   |-- app.py
+|   |-- config.py
+|   |-- middleware/
+|   |-- models/
+|   |-- routes/
+|   |-- sockets/
 |   |-- Dockerfile
 |   `-- requirements.txt
 |-- frontend/
-|   |-- App.tsx                 # Frontend root providers and navigator
+|   |-- App.tsx
 |   |-- src/
-|   |   |-- api/                # Axios API clients
-|   |   |-- contexts/           # Auth, socket, and queue state
-|   |   |-- navigation/         # Customer/staff navigation
-|   |   |-- screens/            # Auth, customer, and staff screens
-|   |   |-- components/         # Shared UI components
-|   |   |-- hooks/
+|   |   |-- api/
+|   |   |-- components/
+|   |   |-- contexts/
+|   |   |-- navigation/
+|   |   |-- screens/
 |   |   |-- types/
 |   |   `-- utils/
+|   |-- .env.example
 |   `-- package.json
 |-- docker-compose.yml
 `-- Project_Proposal.pdf
@@ -82,64 +105,59 @@ Supporting implementation tools:
 
 ## Prerequisites
 
-- Docker and Docker Compose
 - Node.js and npm
-- Expo CLI through `npx expo`
-
-For local backend development without Docker:
-
 - Python 3.12+
-- MongoDB running locally
+- MongoDB running locally, or Docker Desktop for MongoDB
+- Android Studio / Android Emulator for Android testing
+- Expo Go on a physical phone if testing with a real device
 
-## Environment Variables
+## Environment Files
 
-Backend configuration is read from `backend/.env`.
-
-Example:
-
-```env
-MONGO_URI=mongodb://localhost:27017/restaurant_queue
-JWT_SECRET=change_me_to_a_long_random_string_in_production
-JWT_EXPIRY_HOURS=24
-STAFF_SESSION_TIMEOUT_MINUTES=60
-FLASK_ENV=development
-PORT=5000
-CORS_ORIGINS=http://localhost:8081,http://localhost:19006
-```
-
-Frontend configuration is read from `frontend/.env`.
-
-Example:
-
-```env
-EXPO_PUBLIC_API_URL=http://localhost:5000
-```
-
-If testing on a physical phone, replace `localhost` with the LAN IP address of the machine running the backend, for example:
-
-```env
-EXPO_PUBLIC_API_URL=http://192.168.1.123:5000
-```
-
-## Running the Project
-
-### 1. Start MongoDB and Backend
-
-From the repository root:
+Environment files are ignored by git. Use the examples:
 
 ```bash
-docker compose up --build
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
 
-This starts:
+For local web testing, `frontend/.env` can use:
 
-- MongoDB on port `27017`
-- Flask backend on port `5000`
+```env
+EXPO_PUBLIC_API_URL=http://localhost:6001
+```
 
-Check the backend health endpoint:
+For Android emulator or physical phone testing, use your computer LAN IP:
+
+```env
+EXPO_PUBLIC_API_URL=http://192.168.0.111:6001
+```
+
+The backend is commonly run on port `6001` because macOS often occupies port `5000`.
+
+## Run Locally
+
+### 1. Start MongoDB
+
+If MongoDB is already running locally on port `27017`, skip this step.
+
+With Docker:
 
 ```bash
-curl http://localhost:5000/health
+cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system
+docker compose up mongo
+```
+
+### 2. Start Backend
+
+```bash
+cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system/backend
+PORT=6001 CORS_ORIGINS=http://localhost:8082,http://127.0.0.1:8082,http://192.168.0.111:8082 .venv/bin/python app.py
+```
+
+Health check:
+
+```bash
+curl http://127.0.0.1:6001/health
 ```
 
 Expected response:
@@ -150,22 +168,37 @@ Expected response:
 }
 ```
 
-### 2. Start the Frontend
-
-In another terminal:
+### 3. Start Web Frontend
 
 ```bash
-cd frontend
-npm install
-npm start
+cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system/frontend
+npm run web -- --port 8082
 ```
 
-Then choose the Expo target:
+Useful web URLs:
 
-- press `i` for iOS simulator
-- press `a` for Android emulator
-- press `w` for web
-- scan the Expo QR code from a physical phone
+- Customer: `http://127.0.0.1:8082`
+- Admin/staff: `http://192.168.0.111:8082`
+- Localhost also works: `http://localhost:8082`
+
+Using different hostnames keeps separate customer/admin browser sessions because web storage is per origin.
+
+### 4. Start Android
+
+Make sure Android Studio has an emulator running, then:
+
+```bash
+cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system/frontend
+npm run android -- --port 8082
+```
+
+Expo opens:
+
+```text
+exp://192.168.0.111:8082
+```
+
+If using a physical Android phone, connect to the same Wi-Fi and scan the Expo QR code with Expo Go.
 
 ## API Overview
 
@@ -176,132 +209,58 @@ Then choose the Expo target:
 | `POST` | `/api/auth/register` | Register customer |
 | `POST` | `/api/auth/login` | Customer login |
 | `POST` | `/api/auth/staff/login` | Staff/admin login |
-| `GET` | `/api/auth/me` | Get current authenticated user |
+| `GET` | `/api/auth/me` | Current authenticated user |
 
 ### Restaurants
 
 | Method | Path | Description |
 | --- | --- | --- |
 | `GET` | `/api/restaurants/` | List/search restaurants |
-| `GET` | `/api/restaurants/<restaurant_id>` | Get restaurant detail |
+| `GET` | `/api/restaurants/<restaurant_id>` | Restaurant details |
 | `POST` | `/api/restaurants/` | Create restaurant, admin only |
-| `GET` | `/api/restaurants/<restaurant_id>/tables` | List restaurant tables, staff/admin only |
+| `GET` | `/api/restaurants/<restaurant_id>/tables` | Restaurant tables |
 
 ### Queues
 
 | Method | Path | Description |
 | --- | --- | --- |
 | `POST` | `/api/queues/join` | Join queue, customer only |
-| `GET` | `/api/queues/my-status` | Get active customer queue |
-| `POST` | `/api/queues/<entry_id>/cancel` | Cancel queue entry |
-| `GET` | `/api/queues/restaurant/<restaurant_id>` | Get restaurant queue, staff/admin only |
-| `GET` | `/api/queues/history` | Get customer queue history |
+| `GET` | `/api/queues/my-status` | Active customer queue |
+| `POST` | `/api/queues/<entry_id>/cancel` | Cancel/leave queue |
+| `GET` | `/api/queues/restaurant/<restaurant_id>` | Staff/admin queue list |
+| `GET` | `/api/queues/history` | Customer queue history |
 
 ### Staff
 
 | Method | Path | Description |
 | --- | --- | --- |
 | `POST` | `/api/staff/call-next` | Call next waiting party |
-| `POST` | `/api/staff/seat/<entry_id>` | Mark party as seated |
+| `POST` | `/api/staff/seat/<entry_id>` | Seat called party, optionally with `table_id` |
 | `POST` | `/api/staff/tables/<table_id>/status` | Update table status |
 | `PATCH` | `/api/staff/settings` | Update restaurant settings, admin only |
 | `POST` | `/api/staff/create-staff` | Create staff account, admin only |
 
-## Data Model Summary
+## Verification Checklist
 
-### User
+Current tested flows:
 
-Customers use email/password authentication. Staff/admin users use a restaurant ID, staff ID, and PIN.
+- Customer login
+- Customer logout
+- Customer restaurant discovery and search
+- Customer queue join
+- Customer leave queue
+- Customer booking history
+- QR Scan tab is reachable
+- Staff/admin login
+- Staff/admin logout
+- Call next party
+- Assign called party to table
+- Table status cycle
+- Restaurant settings save
+- Android emulator launch through Expo
 
-Important fields:
+## Notes
 
-- `role`: `customer`, `staff`, or `admin`
-- `restaurant_id`: staff/admin restaurant ownership
-- `active_queue_entry_id`: customer's current active queue entry
-
-### Restaurant
-
-Important fields:
-
-- `name`
-- `description`
-- `cuisine`
-- `operating_hours`
-- `max_queue_capacity`
-- `avg_turn_time_minutes`
-- `is_accepting_queue`
-- `current_queue_length`
-- `table_count`
-
-### Queue Entry
-
-Important fields:
-
-- `restaurant_id`
-- `user_id`
-- `party_size`
-- `status`: `waiting`, `called`, `seated`, `cancelled`, `expired`
-- `position`
-- `estimated_wait_minutes`
-- `queue_number`
-
-### Table
-
-Important fields:
-
-- `restaurant_id`
-- `table_number`
-- `capacity`
-- `status`: `available`, `occupied`, `reserved`, `cleaning`
-- `current_queue_entry_id`
-
-## Proposal Criteria Status
-
-This checklist is based on `Project_Proposal.pdf`.
-
-| Criteria | Status | Notes |
-| --- | --- | --- |
-| Customer restaurant discovery | Met | Implemented in customer home screen and restaurant API. |
-| View queue length and estimated wait before joining | Met | Restaurant list/detail exposes current queue length and estimated wait. |
-| Remote queue joining through web/app | Met | Customers can join from restaurant detail. Expo can run on mobile and web. |
-| Party size selection | Met | Customers choose party size before joining. |
-| QR code queue joining | Partial | `QRScanScreen` exists and parses `restaurantId:<id>`, but it is not currently wired into customer navigation. |
-| Live queue status | Met | Queue status screen shows queue number, position, wait estimate, and called state. |
-| Countdown/wait timer | Met | Implemented by the queue timer component. |
-| Alert when table is ready | Met | Staff `call-next` emits `your_turn`; customer screen updates to called state. |
-| Booking history with restaurant/status data | Met | Customer history endpoint and screen exist. |
-| Staff ID + PIN login | Met | Staff login uses restaurant ID, staff ID, and PIN. |
-| Staff queue management dashboard | Met | Staff can view waiting/called entries. |
-| Call next party | Met | Staff dashboard calls the next waiting queue entry. |
-| Table status manager | Met | Tables can be cycled through statuses. |
-| Assign queued parties to tables | Partial | Backend supports optional `table_id` while seating, but the current dashboard seats without selecting a table. |
-| Restaurant settings | Mostly met | Capacity, turn time, and accepting queue status are editable. Operating hours exist in the model/API allowlist but are not exposed in the current settings UI. |
-| Customer email/password authentication | Met | Register/login endpoints and screens exist. |
-| Optional Google/social login | Not implemented | The user model has a `google_id` field, but there is no social sign-in flow. |
-| JWT stored securely on device | Met | Native uses Expo SecureStore; web uses localStorage. |
-| Staff/admin session timeout | Met | Staff/admin JWT expiry uses `STAFF_SESSION_TIMEOUT_MINUTES`. |
-| Role-based access control | Met | Backend decorators enforce customer/staff/admin access. |
-| React Native + TypeScript + Expo mobile frontend | Met | Frontend is an Expo React Native TypeScript app. |
-| React Native + TypeScript + Expo web frontend | Met | `npm run web` runs the same Expo app on web. |
-| Python + Flask backend/API | Met | Backend is a Flask API. |
-| MongoDB NoSQL database | Met | Backend uses MongoDB through PyMongo. |
-| JWT authentication | Met | JWT token generation and role guards are implemented. |
-| Flask-SocketIO / polling real-time sync | Met | Flask-SocketIO and socket.io-client are implemented. |
-| Project limitations respected | Met | No payment, GPS tracking, offline mode, or live chat features are implemented. |
-
-## Known Gaps
-
-- There is no seed script or first-admin bootstrap flow. To create restaurants and staff through protected admin endpoints, an admin user must already exist in MongoDB.
-- `max_queue_capacity` is editable but is not enforced when a customer joins a queue.
-- QR scanning exists as a screen but is not reachable from the current customer tabs.
-- Optional Google/social login from the proposal is not implemented.
-- Native push notifications are not implemented; the current alert is in-app through Socket.IO.
-- The web frontend is the Expo Web version of the React Native app, matching the updated proposal stack of React Native + TypeScript + Expo for web.
-- `frontend/.env` should point to the actual backend port. The Docker setup exposes the backend on `5000`.
-
-## Development Notes
-
-- The backend creates indexes on startup for users, queue entries, restaurants, and tables.
-- Customers are restricted to one active queue at a time.
-- Cancelling or seating a queue entry decrements the restaurant queue length and resequences waiting entries.
-- Staff/admin tokens expire sooner than customer tokens based on `STAFF_SESSION_TIMEOUT_MINUTES`.
+- Do not commit `.env`, `.venv`, `node_modules`, or `.expo`.
+- If the frontend shows network errors on Android, confirm `frontend/.env` uses the LAN IP backend URL, not `localhost`.
+- If web and Android are running at the same time, keep the backend on `6001` and Metro on `8082`.
