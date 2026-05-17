@@ -136,21 +136,30 @@ The backend is commonly run on port `6001` because macOS often occupies port `50
 
 ## First-Time Setup
 
+Clone the repository, then enter the project folder:
+
+```bash
+git clone https://github.com/Ice14486/restaurant-queue.git
+cd restaurant-queue
+```
+
 Install the backend dependencies:
 
 ```bash
-cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system/backend
+cd backend
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 cp .env.example .env
+cd ..
 ```
 
 Install the frontend dependencies:
 
 ```bash
-cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system/frontend
+cd frontend
 npm install
 cp .env.example .env
+cd ..
 ```
 
 If you are using Android on a real phone, edit `frontend/.env` so `EXPO_PUBLIC_API_URL` uses your computer LAN IP, for example `http://192.168.0.111:6001`.
@@ -164,21 +173,19 @@ If MongoDB is already running locally on port `27017`, skip this step.
 With Docker:
 
 ```bash
-cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system
 docker compose up mongo
 ```
 
 Or start MongoDB and the backend together:
 
 ```bash
-cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system
 docker compose up --build
 ```
 
 ### 2. Start Backend
 
 ```bash
-cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system/backend
+cd backend
 PORT=6001 CORS_ORIGINS=http://localhost:8082,http://127.0.0.1:8082,http://192.168.0.111:8082 .venv/bin/python app.py
 ```
 
@@ -201,7 +208,7 @@ If you already started the backend with `docker compose up --build`, keep that t
 ### 3. Start Web Frontend
 
 ```bash
-cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system/frontend
+cd frontend
 npm run web -- --port 8082
 ```
 
@@ -218,7 +225,7 @@ Using different hostnames keeps separate customer/admin browser sessions because
 Make sure Android Studio has an emulator running, then:
 
 ```bash
-cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system/frontend
+cd frontend
 npm run android -- --port 8082
 ```
 
