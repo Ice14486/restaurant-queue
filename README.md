@@ -129,7 +129,7 @@ EXPO_PUBLIC_API_URL=http://localhost:6001
 For Android emulator or physical phone testing, use your computer LAN IP:
 
 ```env
-EXPO_PUBLIC_API_URL=http://192.168.0.111:6001
+EXPO_PUBLIC_API_URL=http://<YOUR_COMPUTER_LAN_IP>:6001
 ```
 
 The backend is commonly run on port `6001` because macOS often occupies port `5000`.
@@ -153,6 +153,8 @@ cp .env.example .env
 cd ..
 ```
 
+On Windows PowerShell, use `.\.venv\Scripts\pip install -r requirements.txt` after creating the virtual environment.
+
 Install the frontend dependencies:
 
 ```bash
@@ -162,9 +164,11 @@ cp .env.example .env
 cd ..
 ```
 
-If you are using Android on a real phone, edit `frontend/.env` so `EXPO_PUBLIC_API_URL` uses your computer LAN IP, for example `http://192.168.0.111:6001`.
+If you are using Android on a real phone, edit `frontend/.env` so `EXPO_PUBLIC_API_URL` uses your computer LAN IP, for example `http://<YOUR_COMPUTER_LAN_IP>:6001`. The phone and computer must be on the same Wi-Fi network.
 
 ## Run Locally
+
+Run each service in a separate terminal from the `restaurant-queue` project folder.
 
 ### 1. Start MongoDB
 
@@ -186,7 +190,7 @@ docker compose up --build
 
 ```bash
 cd backend
-PORT=6001 CORS_ORIGINS=http://localhost:8082,http://127.0.0.1:8082,http://192.168.0.111:8082 .venv/bin/python app.py
+.venv/bin/python app.py
 ```
 
 Health check:
@@ -205,6 +209,13 @@ Expected response:
 
 If you already started the backend with `docker compose up --build`, keep that terminal running and skip this manual backend command.
 
+On Windows PowerShell, start the backend with:
+
+```powershell
+cd backend
+.\.venv\Scripts\python app.py
+```
+
 ### 3. Start Web Frontend
 
 ```bash
@@ -215,7 +226,7 @@ npm run web -- --port 8082
 Useful web URLs:
 
 - Customer: `http://127.0.0.1:8082`
-- Admin/staff: `http://192.168.0.111:8082`
+- Admin/staff on another browser/device: `http://<YOUR_COMPUTER_LAN_IP>:8082`
 - Localhost also works: `http://localhost:8082`
 
 Using different hostnames keeps separate customer/admin browser sessions because web storage is per origin.
@@ -232,7 +243,7 @@ npm run android -- --port 8082
 Expo opens:
 
 ```text
-exp://192.168.0.111:8082
+exp://<YOUR_COMPUTER_LAN_IP>:8082
 ```
 
 If using a physical Android phone, connect to the same Wi-Fi and scan the Expo QR code with Expo Go.

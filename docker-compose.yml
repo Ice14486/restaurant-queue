@@ -23,7 +23,7 @@ services:
       JWT_SECRET: replace_in_production
       FLASK_ENV: development
       PORT: 6001
-      CORS_ORIGINS: http://localhost:8082,http://127.0.0.1:8082,http://192.168.0.111:8082
+      CORS_ORIGINS: "*"
     depends_on:
       - mongo
     volumes:

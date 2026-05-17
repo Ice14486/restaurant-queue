@@ -18,7 +18,7 @@ def create_app() -> Flask:
     _ensure_indexes(app.db)
 
     # ── Extensions ───────────────────────────────────────────
-    CORS(app, origins=Config.CORS_ORIGINS, supports_credentials=True)
+    CORS(app, origins=Config.CORS_ORIGINS, supports_credentials=Config.CORS_ORIGINS != "*")
     Limiter(
         get_remote_address,
         app=app,
@@ -75,4 +75,10 @@ def _ensure_indexes(db):
 
 if __name__ == "__main__":
     app = create_app()
-    socketio.run(app, host="0.0.0.0", port=Config.PORT, debug=Config.DEBUG)
+    socketio.run(
+        app,
+        host="0.0.0.0",
+        port=Config.PORT,
+        debug=Config.DEBUG,
+        allow_unsafe_werkzeug=True,
+    )
