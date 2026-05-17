@@ -17,11 +17,13 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "6001:6001"
     environment:
       MONGO_URI: mongodb://mongo:27017/restaurant_queue
       JWT_SECRET: replace_in_production
       FLASK_ENV: development
+      PORT: 6001
+      CORS_ORIGINS: http://localhost:8082,http://127.0.0.1:8082,http://192.168.0.111:8082
     depends_on:
       - mongo
     volumes:

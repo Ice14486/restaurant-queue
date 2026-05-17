@@ -134,6 +134,27 @@ EXPO_PUBLIC_API_URL=http://192.168.0.111:6001
 
 The backend is commonly run on port `6001` because macOS often occupies port `5000`.
 
+## First-Time Setup
+
+Install the backend dependencies:
+
+```bash
+cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system/backend
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+cp .env.example .env
+```
+
+Install the frontend dependencies:
+
+```bash
+cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system/frontend
+npm install
+cp .env.example .env
+```
+
+If you are using Android on a real phone, edit `frontend/.env` so `EXPO_PUBLIC_API_URL` uses your computer LAN IP, for example `http://192.168.0.111:6001`.
+
 ## Run Locally
 
 ### 1. Start MongoDB
@@ -145,6 +166,13 @@ With Docker:
 ```bash
 cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system
 docker compose up mongo
+```
+
+Or start MongoDB and the backend together:
+
+```bash
+cd /Users/phuditpreechanarit/Desktop/restaurant-queue-system
+docker compose up --build
 ```
 
 ### 2. Start Backend
@@ -167,6 +195,8 @@ Expected response:
   "status": "ok"
 }
 ```
+
+If you already started the backend with `docker compose up --build`, keep that terminal running and skip this manual backend command.
 
 ### 3. Start Web Frontend
 

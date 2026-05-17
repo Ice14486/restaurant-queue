@@ -19,3 +19,10 @@ mongo_data/
 .DS_Store
 Thumbs.db
 .Rhistory
+
+# Local presentation/demo exports
+2026-*.mov
+slide*.m4a
+message*.txt
+queue-app-presentation-fixed.pptx
+video-previews/
